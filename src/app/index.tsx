@@ -1,98 +1,222 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useState } from 'react';
+import {
+  SafeAreaView,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+// ==========================================
+// CUSTOM HOOK
+// ==========================================
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
+function useContador(valorInicial = 0) {
+  const [valor, setValor] = useState(valorInicial);
+
+  function incrementar() {
+    setValor(valorAnterior => valorAnterior + 1);
   }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
+
+  function decrementar() {
+    setValor(valorAnterior => valorAnterior - 1);
   }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+
+  function zerar() {
+    setValor(valorInicial);
+  }
+
+  return {
+    valor,
+    incrementar,
+    decrementar,
+    zerar,
+  };
+}
+
+// ==========================================
+// COMPONENTE
+// ==========================================
+
+export default function App() {
+  // O mesmo Custom Hook é utilizado duas vezes.
+  // Cada chamada possui seu próprio estado.
+
+  const contador1 = useContador(0);
+  const contador2 = useContador(10);
+
   return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.titulo}>
+        Custom Hook: useContador
+      </Text>
+
+      <Text style={styles.subtitulo}>
+        Dois contadores utilizando a mesma lógica
+      </Text>
+
+      {/* CONTADOR 1 */}
+      <View style={styles.card}>
+        <Text style={styles.nome}>Contador 1</Text>
+
+        <Text style={styles.valor}>
+          {contador1.valor}
+        </Text>
+
+        <View style={styles.botoes}>
+          <TouchableOpacity
+            style={styles.botao}
+            onPress={contador1.decrementar}
+          >
+            <Text style={styles.textoBotao}>−</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.botao}
+            onPress={contador1.incrementar}
+          >
+            <Text style={styles.textoBotao}>+</Text>
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity
+          style={styles.botaoZerar}
+          onPress={contador1.zerar}
+        >
+          <Text style={styles.textoZerar}>Zerar</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* CONTADOR 2 */}
+      <View style={styles.card}>
+        <Text style={styles.nome}>Contador 2</Text>
+
+        <Text style={styles.valor}>
+          {contador2.valor}
+        </Text>
+
+        <View style={styles.botoes}>
+          <TouchableOpacity
+            style={styles.botao}
+            onPress={contador2.decrementar}
+          >
+            <Text style={styles.textoBotao}>−</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.botao}
+            onPress={contador2.incrementar}
+          >
+            <Text style={styles.textoBotao}>+</Text>
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity
+          style={styles.botaoZerar}
+          onPress={contador2.zerar}
+        >
+          <Text style={styles.textoZerar}>Zerar</Text>
+        </TouchableOpacity>
+      </View>
+
+      <Text style={styles.explicacao}>
+        O useContador contém a lógica do contador.
+        {'\n\n'}
+        A mesma lógica é reutilizada em dois lugares,
+        mas cada contador mantém seu próprio estado.
+      </Text>
+    </SafeAreaView>
   );
 }
 
-export default function HomeScreen() {
-  return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
-
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
-
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
-
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
-  );
-}
+// ==========================================
+// ESTILOS
+// ==========================================
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
+    backgroundColor: '#0D0D0D',
+    padding: 20,
   },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
-  },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
-  title: {
+
+  titulo: {
+    fontSize: 28,
+    fontWeight: 'bold',
     textAlign: 'center',
+    marginTop: 20,
+    color: '#FFFFFF',
   },
-  code: {
-    textTransform: 'uppercase',
+
+  subtitulo: {
+    fontSize: 16,
+    textAlign: 'center',
+    color: '#B3B3B3',
+    marginBottom: 20,
   },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+
+  card: {
+    backgroundColor: '#1A1A1A',
+    padding: 20,
+    borderRadius: 15,
+    marginBottom: 15,
+    elevation: 5,
+  },
+
+  nome: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#FFFFFF',
+  },
+
+  valor: {
+    fontSize: 48,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginVertical: 15,
+    color: '#E50914',
+  },
+
+  botoes: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 15,
+  },
+
+  botao: {
+    backgroundColor: '#C00000',
+    width: 60,
+    height: 50,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  textoBotao: {
+    color: '#FFFFFF',
+    fontSize: 30,
+    fontWeight: 'bold',
+  },
+
+  botaoZerar: {
+    marginTop: 15,
+    backgroundColor: '#333333',
+    padding: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+
+  textoZerar: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+
+  explicacao: {
+    textAlign: 'center',
+    marginTop: 10,
+    color: '#AAAAAA',
+    lineHeight: 22,
   },
 });
