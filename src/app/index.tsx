@@ -6,33 +6,8 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
+import useContador from '@/hooks/useContador';
 
-// ==========================================
-// CUSTOM HOOK
-// ==========================================
-
-function useContador(valorInicial = 0) {
-  const [valor, setValor] = useState(valorInicial);
-
-  function incrementar() {
-    setValor(valorAnterior => valorAnterior + 1);
-  }
-
-  function decrementar() {
-    setValor(valorAnterior => valorAnterior - 1);
-  }
-
-  function zerar() {
-    setValor(valorInicial);
-  }
-
-  return {
-    valor,
-    incrementar,
-    decrementar,
-    zerar,
-  };
-}
 
 // ==========================================
 // COMPONENTE
